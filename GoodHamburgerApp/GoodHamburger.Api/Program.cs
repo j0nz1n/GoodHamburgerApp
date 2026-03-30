@@ -86,6 +86,11 @@ app.MapPost("/api/orders/{orderId:guid}/items", async (Guid orderId, AddItemRequ
     }
 });
 
+app.MapGet("/api/menu", async (AppDbContext db) =>
+{
+    var items = await db.MenuItems.ToListAsync();
+    return Results.Ok(items);
+});
 
 app.MapGet("/api/orders/{orderId:guid}", async (Guid orderId, AppDbContext db) =>
 {

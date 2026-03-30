@@ -1,0 +1,53 @@
+﻿@using GoodHamburger.Api.Models
+@using System.Globalization
+
+<div class="card h-100 shadow-sm transition-card">
+   
+
+    <div class="card-body d-flex flex-column">
+        <div class="d-flex justify-content-between align-items-center mb-2">
+            <h5 class="card-title mb-0 fw-bold text-dark">@Item.Name</h5>
+            
+            <span class="badge @(Item.Type == TypeItem.Hamburger ? "bg-danger" : "bg-warning text-dark")">
+                @Item.Type.ToString()
+            </span>
+        </div>
+        
+        <p class="card-text text-muted small flex-grow-1">
+            Delicious @Item.Name prepared with the best ingredients of GoodHamburger.
+        </p>
+        
+        <div class="d-flex justify-content-between align-items-center mt-3 border-top pt-3">
+            <span class="fs-5 fw-bold text-success">@Item.Price.ToString("C", new CultureInfo("en-US"))</span>
+            
+            
+            <button class="btn @(IsDisabled ? "btn-secondary" : "btn-primary") btn-sm rounded-pill px-3"
+                    @onclick="OnAddClicked"
+                    disabled="@IsDisabled">
+                <i class="bi @(IsDisabled ? "bi-check-lg" : "bi-cart-plus") me-1"></i>
+                @(IsDisabled ? "Added" : "Add")
+            </button>
+        </div>
+    </div>
+</div>
+
+@code {
+    
+    [Parameter]
+    public MenuItem Item { get; set; } = new();
+
+    
+    [Parameter]
+    public EventCallback OnAddClicked { get; set; }
+    [Parameter] public bool IsDisabled { get; set; }
+}
+
+<style>
+    .transition-card {
+        transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
+    }
+    .transition-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15) !important;
+    }
+</style>
