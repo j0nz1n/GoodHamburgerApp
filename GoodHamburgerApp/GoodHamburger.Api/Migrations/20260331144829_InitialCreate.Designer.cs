@@ -11,7 +11,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace GoodHamburger.Api.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20260326145255_InitialCreate")]
+    [Migration("20260331144829_InitialCreate")]
     partial class InitialCreate
     {
         /// <inheritdoc />
@@ -20,7 +20,7 @@ namespace GoodHamburger.Api.Migrations
 #pragma warning disable 612, 618
             modelBuilder.HasAnnotation("ProductVersion", "8.0.0");
 
-            modelBuilder.Entity("GoodHamburger.Api.Models.MenuItem", b =>
+            modelBuilder.Entity("GoodHamburger.Shared.Models.MenuItem", b =>
                 {
                     b.Property<Guid>("MenuItemId")
                         .ValueGeneratedOnAdd()
@@ -80,7 +80,7 @@ namespace GoodHamburger.Api.Migrations
                         });
                 });
 
-            modelBuilder.Entity("GoodHamburger.Api.Models.Order", b =>
+            modelBuilder.Entity("GoodHamburger.Shared.Models.Order", b =>
                 {
                     b.Property<Guid>("OrderId")
                         .ValueGeneratedOnAdd()
@@ -90,17 +90,17 @@ namespace GoodHamburger.Api.Migrations
                         .HasColumnType("TEXT");
 
                     b.Property<decimal>("Price")
-                        .HasColumnType("TEXT");
+                        .HasColumnType("decimal(18,2)");
 
                     b.Property<decimal>("TotalPrice")
-                        .HasColumnType("TEXT");
+                        .HasColumnType("decimal(18,2)");
 
                     b.HasKey("OrderId");
 
                     b.ToTable("Orders");
                 });
 
-            modelBuilder.Entity("GoodHamburger.Api.Models.OrderItem", b =>
+            modelBuilder.Entity("GoodHamburger.Shared.Models.OrderItem", b =>
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
@@ -125,33 +125,21 @@ namespace GoodHamburger.Api.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("MenuItemId");
-
                     b.HasIndex("OrderId");
 
                     b.ToTable("OrderItems");
                 });
 
-            modelBuilder.Entity("GoodHamburger.Api.Models.OrderItem", b =>
+            modelBuilder.Entity("GoodHamburger.Shared.Models.OrderItem", b =>
                 {
-                    b.HasOne("GoodHamburger.Api.Models.MenuItem", "MenuItem")
-                        .WithMany()
-                        .HasForeignKey("MenuItemId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("GoodHamburger.Api.Models.Order", "Order")
+                    b.HasOne("GoodHamburger.Shared.Models.Order", null)
                         .WithMany("OrderItems")
                         .HasForeignKey("OrderId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
-
-                    b.Navigation("MenuItem");
-
-                    b.Navigation("Order");
                 });
 
-            modelBuilder.Entity("GoodHamburger.Api.Models.Order", b =>
+            modelBuilder.Entity("GoodHamburger.Shared.Models.Order", b =>
                 {
                     b.Navigation("OrderItems");
                 });

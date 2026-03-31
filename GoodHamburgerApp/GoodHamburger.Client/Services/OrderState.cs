@@ -1,4 +1,4 @@
-﻿using GoodHamburger.Api.Models;
+﻿using GoodHamburger.Shared.Models;
 using System.Net.Http.Json;
 
 namespace GoodHamburger.Client.Services
@@ -45,7 +45,7 @@ namespace GoodHamburger.Client.Services
                     }
                 }
 
-                
+
                 if (CurrentOrder != null)
                 {
                     var request = new { MenuItemId = item.MenuItemId };
@@ -54,7 +54,11 @@ namespace GoodHamburger.Client.Services
                     if (responseItem.IsSuccessStatusCode)
                     {
                         
-                        CurrentOrder = await responseItem.Content.ReadFromJsonAsync<Order>();
+                        var updatedOrder = await responseItem.Content.ReadFromJsonAsync<Order>();
+                        if (updatedOrder != null)
+                        {
+                            CurrentOrder = updatedOrder;
+                        }
                     }
                     else
                     {

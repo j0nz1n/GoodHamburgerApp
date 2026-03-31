@@ -1,5 +1,5 @@
 ﻿@page "/menu"
-@using GoodHamburger.Api.Models
+@using GoodHamburger.Shared.Models
 @using GoodHamburger.Client.Components
 @using GoodHamburger.Client.Services
 @using System.Globalization
@@ -31,9 +31,9 @@
                     @foreach (var burger in menuItems.Where(x => x.Type == TypeItem.Hamburger))
                     {
                         <div class="col-lg-4 col-md-6 mb-4">
-                            <ItemCard Item="burger"
-                                      OnAddClicked="() => OrderState.AddItem(burger)"
-                                      IsDisabled="OrderState.IsItemInOrder(burger.MenuItemId)" />
+                            <ItemCard Item="@burger"
+                                      OnAddClicked="@(() => OrderState.AddItem(burger))"
+                                      IsDisabled="@OrderState.IsItemInOrder(burger.MenuItemId)" />
                         </div>
                     }
                 }

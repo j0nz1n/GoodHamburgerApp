@@ -1,5 +1,5 @@
 using GoodHamburger.Api.Data;
-using GoodHamburger.Api.Models;
+using GoodHamburger.Shared.Models;
 using Microsoft.EntityFrameworkCore;
 using System.Text.Json.Serialization;
 
@@ -59,30 +59,50 @@ app.MapPost("/api/orders", async (AppDbContext db) =>
 });
 
 
-app.MapPost("/api/orders/{orderId:guid}/items", async (Guid orderId, AddItemRequest request, AppDbContext db) => {
-
+app.MapPost("/api/orders/{orderId:guid}/items", async (Guid orderId, AddItemRequest request, AppDbContext db) =>
+{
     
     var order = await db.Orders
         .Include(o => o.OrderItems)
+        .AsNoTracking()
         .FirstOrDefaultAsync(o => o.OrderId == orderId);
 
     if (order == null) return Results.NotFound("Pedido não encontrado.");
 
-    
-    var menuItem = await db.MenuItems.FindAsync(request.MenuItemId);
+    var menuItem = await db.MenuItems.AsNoTracking()
+        .FirstOrDefaultAsync(m => m.MenuItemId == request.MenuItemId);
+
     if (menuItem == null) return Results.NotFound("Item do menu não encontrado.");
 
     try
     {
         
-        order.AddItem(menuItem);
+        var newItem = new OrderItem
+        {
+            Id = Guid.NewGuid(), 
+            OrderId = order.OrderId,
+            MenuItemId = menuItem.MenuItemId,
+            Name = menuItem.Name,
+            Price = menuItem.Price,
+            Type = menuItem.Type
+        };
 
+        
+        order.OrderItems.Add(newItem);
+        order.UpdateTotals();
+
+        
+        db.OrderItems.Add(newItem);
+        db.Orders.Update(order);
+
+        
         await db.SaveChangesAsync();
+
         return Results.Ok(order);
     }
     catch (Exception ex)
     {
-        return Results.BadRequest(ex.Message);
+        return Results.BadRequest($"Erro ao salvar: {ex.Message}");
     }
 });
 
@@ -125,26 +145,28 @@ app.MapPut("/api/orders/{orderId:guid}", async (Guid orderId, UpdateOrderRequest
     
     order.OrderItems.Clear();
 
-    
+
     foreach (var itemId in request.MenuItemIds)
     {
         var menuItem = await db.MenuItems.FindAsync(itemId);
         if (menuItem is null) return Results.BadRequest($"Item do menu {itemId} não existe.");
 
-        try
+        
+        var orderItem = new OrderItem
         {
-            
-            order.AddItem(menuItem);
-        }
-        catch (Exception ex)
-        {
-            return Results.BadRequest(ex.Message);
-        }
+            OrderId = order.OrderId,
+            MenuItemId = menuItem.MenuItemId,
+            Name = menuItem.Name,
+            Price = menuItem.Price,
+            Type = menuItem.Type
+        };
+
+        order.OrderItems.Add(orderItem);
     }
 
     
+    order.UpdateTotals();
     await db.SaveChangesAsync();
-
     return Results.Ok(order);
 });
 
@@ -158,6 +180,11 @@ app.MapDelete("/api/orders/{orderId:guid}", async (Guid orderId, AppDbContext db
     return Results.NoContent();
 });
 
+using (var scope = app.Services.CreateScope())
+{
+    var db = scope.ServiceProvider.GetRequiredService<AppDbContext>();
+    db.Database.EnsureCreated();
+}
 
 app.Run();
 

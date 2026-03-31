@@ -33,8 +33,8 @@ namespace GoodHamburger.Api.Migrations
                 {
                     OrderId = table.Column<Guid>(type: "TEXT", nullable: false),
                     CreatedAt = table.Column<DateTime>(type: "TEXT", nullable: false),
-                    Price = table.Column<decimal>(type: "TEXT", nullable: false),
-                    TotalPrice = table.Column<decimal>(type: "TEXT", nullable: false)
+                    Price = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
+                    TotalPrice = table.Column<decimal>(type: "decimal(18,2)", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -56,12 +56,6 @@ namespace GoodHamburger.Api.Migrations
                 {
                     table.PrimaryKey("PK_OrderItems", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_OrderItems_MenuItems_MenuItemId",
-                        column: x => x.MenuItemId,
-                        principalTable: "MenuItems",
-                        principalColumn: "MenuItemId",
-                        onDelete: ReferentialAction.Cascade);
-                    table.ForeignKey(
                         name: "FK_OrderItems_Orders_OrderId",
                         column: x => x.OrderId,
                         principalTable: "Orders",
@@ -82,11 +76,6 @@ namespace GoodHamburger.Api.Migrations
                 });
 
             migrationBuilder.CreateIndex(
-                name: "IX_OrderItems_MenuItemId",
-                table: "OrderItems",
-                column: "MenuItemId");
-
-            migrationBuilder.CreateIndex(
                 name: "IX_OrderItems_OrderId",
                 table: "OrderItems",
                 column: "OrderId");
@@ -96,10 +85,10 @@ namespace GoodHamburger.Api.Migrations
         protected override void Down(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.DropTable(
-                name: "OrderItems");
+                name: "MenuItems");
 
             migrationBuilder.DropTable(
-                name: "MenuItems");
+                name: "OrderItems");
 
             migrationBuilder.DropTable(
                 name: "Orders");
